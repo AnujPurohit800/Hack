@@ -1,15 +1,25 @@
 import { useState } from "react";
 import LoginBg from "../assets/LoginBg.jpg";
 import axios from "axios";
+
 const Login = ({ setIsLoggedIn, setUsername }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [usernameInput, setUsernameInput] = useState("");
   const [password, setPassword] = useState("");
-  
 
+  // States for Signup
+  const [fullName, setFullName] = useState("");
+  const [studentID, setStudentID] = useState("");
+  const [email, setEmail] = useState("");
+
+
+
+
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+    console.log(usernameInput, password);
+
     if (isLogin) {
       // LOGIN
       try {
@@ -17,34 +27,34 @@ const Login = ({ setIsLoggedIn, setUsername }) => {
           studentId: usernameInput,
           password: password,
         });
-  
+
         setUsername(usernameInput);
         setIsLoggedIn(true);
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("username", usernameInput);
         alert(res.data.message);
       } catch (error) {
+        console.log(error);
         alert(error.response?.data?.message || "Login failed");
       }
     } else {
       // SIGNUP
       try {
-        const res = await axios.post("http://localhost:3000/signup", {
-          username: usernameInput,
-          password,
-          fullName: "Demo Name",       // You can get these values from inputs
-          studentID: "12345",          // Same here
-          email: "email@example.com",  // Or bind inputs for real values
+        const res = await axios.post("http://localhost:3000/api/users/signup", {
+          email: email,
+          name: fullName,
+          studentId: studentID,
+          password: password,
         });
-  
+
         alert(res.data.message);
         setIsLogin(true); // Switch to login after successful signup
       } catch (error) {
+        console.log(error);
         alert(error.response?.data?.message || "Signup failed");
       }
     }
   };
- 
 
   return (
     <div className="min-h-screen w-screen relative">
@@ -71,15 +81,12 @@ const Login = ({ setIsLoggedIn, setUsername }) => {
 
           {/* Right Side - Form */}
           <div className="w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-start gap-4 md:gap-6">
-            {/* Heading */}
             <h1 className="text-center font-bold text-black text-xl md:text-2xl mb-2">
               Hey there, welcome back to{" "}
               <span className="text-[#4CAF50]">Back2U</span>!
             </h1>
 
-            {/* Container for toggle and form */}
             <div className="flex flex-col justify-center gap-4">
-              {/* Toggle buttons */}
               <div className="flex mb-4">
                 <button
                   className={`flex-1 py-2 text-sm md:text-base text-center ${
@@ -104,7 +111,10 @@ const Login = ({ setIsLoggedIn, setUsername }) => {
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-3 md:space-y-4 text-black">
+              <form
+                onSubmit={handleSubmit}
+                className="space-y-3 md:space-y-4 text-black"
+              >
                 {!isLogin && (
                   <>
                     <div>
@@ -113,6 +123,8 @@ const Login = ({ setIsLoggedIn, setUsername }) => {
                       </label>
                       <input
                         type="text"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
                         className="w-full p-2 border border-[#E2E8F0] rounded-lg focus:ring-[#2462EA] focus:ring-2 outline-none"
                         placeholder="Enter your full name"
                       />
@@ -123,6 +135,8 @@ const Login = ({ setIsLoggedIn, setUsername }) => {
                       </label>
                       <input
                         type="text"
+                        value={studentID}
+                        onChange={(e) => setStudentID(e.target.value)}
                         className="w-full p-2 border border-[#E2E8F0] rounded-lg focus:ring-[#2462EA] focus:ring-2 outline-none"
                         placeholder="Enter your student ID"
                       />
@@ -131,6 +145,8 @@ const Login = ({ setIsLoggedIn, setUsername }) => {
                       <label className="block text-[#64748B] mb-1">Email</label>
                       <input
                         type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         className="w-full p-2 border border-[#E2E8F0] rounded-lg focus:ring-[#2462EA] focus:ring-2 outline-none"
                         placeholder="Enter your email"
                       />
