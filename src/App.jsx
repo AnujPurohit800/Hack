@@ -1,18 +1,46 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
-import "./App.css";
-
+import { useState, useEffect, Profiler } from "react";
+import { Routes, Route } from "react-router-dom";
+import Wrapper from "./components/Wrapper";
+import Login from "./components/Login";
+import Home from "./pages/Home";
+import Report from './pages/Report'
+import Search from "./pages/Search";
+import Profile from './pages/Profile'
+import Chat from "./pages/Chat";
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem('isLoggedIn') === 'true';
+  });
+ 
+  
+  const [username, setUsername] = useState(() => {
+    return localStorage.getItem('username') || '';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('isLoggedIn', isLoggedIn);
+    localStorage.setItem('username', username);
+  }, [isLoggedIn, username]);
+
   return (
-    <div className="w-screen h-screen flex flex-col items-center justify-center bg-gray-900 text-white text-center">
-      <div className="flex items-center space-x-4 mb-4">
-        <img src={viteLogo} alt="Vite Logo" className="h-20" />
-        <img src={reactLogo} alt="React Logo" className="h-20 animate-spin-slow" />
-      </div>
-      <h1 className="text-2xl font-bold">Welcome to Vite + React + Tailwind Starter</h1>
-      <p className="text-gray-400 mt-2">Get started by editing <code className="bg-gray-800 px-2 py-1 rounded">App.jsx</code></p>
-    </div>
+    <>
+   
+      {!isLoggedIn ? (
+        <Login setIsLoggedIn={setIsLoggedIn} setUsername={setUsername} />
+      ) : (
+        <Routes>
+          <Route path="/" element={<Wrapper username={username} setIsLoggedIn={setIsLoggedIn} />}>
+            <Route index element={<Home />} />
+            <Route path="/report" element={<Report />} />
+            <Route path="/search" element={<Search />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/chat" element={<Chat />} />
+          </Route>
+        </Routes>
+      )}
+      
+
+    </>
   );
 }
 
