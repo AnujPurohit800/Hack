@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { Outlet, Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Outlet, Link, useNavigate, Navigate } from "react-router-dom";
+
 import {
   Search,
   Home,
@@ -10,18 +11,19 @@ import {
   LogOut,
   Menu,
   CirclePlus,
-  MessageCircle
+  MessageCircle,
 } from "lucide-react";
-import Logo from '../assets/Logo.png'
-function Wrapper({ username , setIsLoggedIn }) {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
-  const navigate = useNavigate();
+import Logo from "../assets/Logo.png";
+import { useAuth } from "../Hooks/api/context/useAuth";
 
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("username");
-    window.location.reload();
-    setIsLoggedIn(false)
+function Wrapper() {
+  const navigate=useNavigate();
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
+  const { logout, setIsLoggedIn } = useAuth();
+  const handleLogout = async () => {
+    console.log("inside");
+    await logout();
+  
   };
 
   const NavLinks = () => (
@@ -30,7 +32,7 @@ function Wrapper({ username , setIsLoggedIn }) {
         to="/"
         className="flex items-center gap-3 p-2 hover:bg-gray-800 rounded-lg"
       >
-        <Home  />
+        <Home />
         <span className={`${isSidebarCollapsed ? "hidden" : "block"}`}>
           Home
         </span>
@@ -39,7 +41,7 @@ function Wrapper({ username , setIsLoggedIn }) {
         to="/report"
         className="flex items-center gap-3 p-2 hover:bg-gray-800 rounded-lg"
       >
-        <FileText  />
+        <FileText />
         <span className={`${isSidebarCollapsed ? "hidden" : "block"}`}>
           Report
         </span>
@@ -48,12 +50,12 @@ function Wrapper({ username , setIsLoggedIn }) {
         to="/search"
         className="flex items-center gap-3 p-2 hover:bg-gray-800 rounded-lg"
       >
-        <Search  />
+        <Search />
         <span className={`${isSidebarCollapsed ? "hidden" : "block"}`}>
           Search
         </span>
       </Link>
-      
+
       <Link
         to="/profile"
         className="flex items-center gap-3 p-2 hover:bg-gray-800 rounded-lg"
@@ -75,7 +77,6 @@ function Wrapper({ username , setIsLoggedIn }) {
     </>
   );
 
-  
   <button
     onClick={handleLogout}
     className="flex items-center gap-3 p-2 hover:bg-gray-800 rounded-lg text-red-500"
@@ -95,7 +96,10 @@ function Wrapper({ username , setIsLoggedIn }) {
           >
             <Menu size={20} />
           </button>
-          <span className="text-2xl flex justify-center items-center gap-2 font-bold tracking-[0.2em] font-mono  text-[#ffff]"><img src={Logo} alt="Logo" width={50} />BACK2 <span className="text-blue-500 block -ml-1 ">U</span> </span>
+          <span className="text-2xl flex justify-center items-center gap-2 font-bold tracking-[0.2em] font-mono  text-[#ffff]">
+            <img src={Logo} alt="Logo" width={50} />
+            BACK2 <span className="text-blue-500 block -ml-1 ">U</span>{" "}
+          </span>
         </div>
         <div className=" flex gap-12  ">
           {/* Search */}
@@ -107,7 +111,7 @@ function Wrapper({ username , setIsLoggedIn }) {
           {/* User Profile */}
           <div className="w-10 h-10 rounded-full bg-gray-700 overflow-hidden cursor-pointer">
             <img
-              src={`https://api.dicebear.com/7.x/initials/svg?seed=${username}`}
+              src={`https://robohash.org/divyanshu`}
               alt="profile"
               className="w-full h-full object-cover"
             />

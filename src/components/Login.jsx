@@ -1,60 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LoginBg from "../assets/LoginBg.jpg";
-import axios from "axios";
+import { useSignin } from "../Hooks/api/Auth/useSignin";
 
-const Login = ({ setIsLoggedIn, setUsername }) => {
+const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [usernameInput, setUsernameInput] = useState("");
   const [password, setPassword] = useState("");
-
-  // States for Signup
   const [fullName, setFullName] = useState("");
-  const [studentID, setStudentID] = useState("");
+  const [studentId, setStudentId] = useState("");
   const [email, setEmail] = useState("");
+  const {isPending,isSuccess,signinMutation}=useSignin();
 
-
-
-
-  
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log(usernameInput, password);
-
-    if (isLogin) {
-      // LOGIN
-      try {
-        const res = await axios.post("http://localhost:3000/api/users/signin", {
-          studentId: usernameInput,
-          password: password,
-        });
-
-        setUsername(usernameInput);
-        setIsLoggedIn(true);
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("username", usernameInput);
-        alert(res.data.message);
-      } catch (error) {
-        console.log(error);
-        alert(error.response?.data?.message || "Login failed");
+    e.preventDefault()
+    
+    console.log(studentId,password)
+    await signinMutation(
+      {
+        studentId,
+        password
       }
-    } else {
-      // SIGNUP
-      try {
-        const res = await axios.post("http://localhost:3000/api/users/signup", {
-          email: email,
-          name: fullName,
-          studentId: studentID,
-          password: password,
-        });
+    )
 
-        alert(res.data.message);
-        setIsLogin(true); // Switch to login after successful signup
-      } catch (error) {
-        console.log(error);
-        alert(error.response?.data?.message || "Signup failed");
-      }
-    }
-  };
+  }
 
   return (
     <div className="min-h-screen w-screen relative">
@@ -135,8 +103,10 @@ const Login = ({ setIsLoggedIn, setUsername }) => {
                       </label>
                       <input
                         type="text"
-                        value={studentID}
-                        onChange={(e) => setStudentID(e.target.value)}
+                        value={studentId}
+                        onChange={(e) => {
+                          
+                        }}
                         className="w-full p-2 border border-[#E2E8F0] rounded-lg focus:ring-[#2462EA] focus:ring-2 outline-none"
                         placeholder="Enter your student ID"
                       />
@@ -157,12 +127,12 @@ const Login = ({ setIsLoggedIn, setUsername }) => {
                 {isLogin && (
                   <div>
                     <label className="block text-[#64748B] mb-1">
-                      Username
+                      Student Id
                     </label>
                     <input
                       type="text"
-                      value={usernameInput}
-                      onChange={(e) => setUsernameInput(e.target.value)}
+                      value={studentId}
+                      onChange={(e) => setStudentId(e.target.value)}
                       className="w-full p-1.5 md:p-2 text-sm md:text-base border border-[#E2E8F0] rounded-lg focus:ring-[#2462EA] focus:ring-2 outline-none"
                       placeholder="Enter your username"
                     />
