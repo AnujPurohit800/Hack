@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { Outlet, Link, useNavigate, Navigate } from "react-router-dom";
 
 import {
@@ -12,18 +12,24 @@ import {
   Menu,
   CirclePlus,
   MessageCircle,
+  PanelTop,
 } from "lucide-react";
 import Logo from "../assets/Logo.png";
 import { useAuth } from "../Hooks/api/context/useAuth";
 
 function Wrapper() {
-  const navigate=useNavigate();
+  const navigate = useNavigate();
+  const { logout, setIsLoggedIn, auth } = useAuth();
+  const [UserName, setUsername] = useState("divyanshu");
+  const[studentId, setStudentId] = useState(22151511);
+  useEffect(() => {
+    if (auth.user) {
+      setUsername(auth.user.name);
+    }
+  }, [auth.user]);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
-  const { logout, setIsLoggedIn } = useAuth();
-  const handleLogout = async () => {
-    console.log("inside");
-    await logout();
-  
+  const handleLogout = () => {
+    logout();
   };
 
   const NavLinks = () => (
@@ -74,6 +80,17 @@ function Wrapper() {
           Chat
         </span>
       </Link>
+      {studentId === 22151511 && (
+        <Link
+          to="/dashboard"
+          className="flex items-center gap-3 p-2 hover:bg-gray-800 rounded-lg"
+        >
+          <PanelTop />
+          <span className={`${isSidebarCollapsed ? "hidden" : "block"}`}>
+            Dashboard
+          </span>
+        </Link>
+      )}
     </>
   );
 
@@ -89,7 +106,10 @@ function Wrapper() {
       {/* Navbar */}
       <nav className="h-16 border-b border-gray-800 px-4 flex items-center justify-between ">
         {/* Logo */}
-        <div className="flex items-center gap-4">
+        <div
+          className="flex items-center gap-4 cursor-pointer"
+          onClick={() => navigate("/")}
+        >
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             className="p-2 hover:bg-gray-800 rounded-lg hidden md:block"
@@ -103,15 +123,21 @@ function Wrapper() {
         </div>
         <div className=" flex gap-12  ">
           {/* Search */}
-          <div className="hidden md:flex items-center gap-12 ">
-            <Search className="w-5 h-5 text-gray-400" />
-            <CirclePlus className="w-5 h-5 text-gray-400" />
+          <div className="hidden md:flex items-center gap-12 cursor-pointer ">
+            <Search
+              onClick={() => navigate("/search")}
+              className="w-5 h-5 text-gray-400"
+            />
+            <CirclePlus
+              onClick={() => navigate("/report")}
+              className="w-5 h-5 text-gray-400"
+            />
           </div>
 
           {/* User Profile */}
           <div className="w-10 h-10 rounded-full bg-gray-700 overflow-hidden cursor-pointer">
             <img
-              src={`https://robohash.org/divyanshu`}
+              src={`https://robohash.org/${UserName}`}
               alt="profile"
               className="w-full h-full object-cover"
             />

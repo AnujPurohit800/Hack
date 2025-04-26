@@ -9,15 +9,11 @@ import Report from "./pages/Report";
 import Search from "./pages/Search";
 import Profile from "./pages/Profile";
 import Chat from "./pages/Chat";
+import Dashboard from './pages/Dashboard'
 import { useAuth } from "./Hooks/api/context/useAuth";
 function App() {
 
   const { isLoggedIn,setIsLoggedIn } = useAuth();
-  // useEffect(() => {
-  //   const user = localStorage.getItem("user");
-  //   const token = localStorage.getItem("token");
-    
-  // }, []);
   const queryClient = new QueryClient();
   return (
 
@@ -27,12 +23,14 @@ function App() {
           <Login />
         ) : (
           <Routes>
-            <Route path="/" element={<Wrapper />}>
+          <Route path="/" element={<Wrapper />}>
               <Route index element={<Home />} />
               <Route path="/report" element={<Report />} />
               <Route path="/search" element={<Search />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/chat" element={<Chat />} />
+              <Route path="/login" element={<login/>}></Route>
+              <Route path="/dashboard" element={<Dashboard/>}></Route>
             </Route>
           </Routes>
         )}

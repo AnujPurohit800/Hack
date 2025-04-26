@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { use, useState,useEffect } from "react";
 import { MapPin, Upload } from "lucide-react";
 import axios from "axios";
-
+import { useAuth } from "../Hooks/api/context/useAuth";
+import { toast } from "react-toastify";
 function Report() {
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -13,6 +14,11 @@ function Report() {
     category: "accessories",
     image: null,
   });
+    const { logout, setIsLoggedIn , auth } = useAuth();
+  const[token,setToken]=useState(null);
+  useEffect(() => {
+      setToken(localStorage.getItem("token"));
+  },[])
   
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -34,45 +40,56 @@ function Report() {
     }));
   };
   
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    const formData = new FormData();
-  
-    formData.append("type", postData.type);
-    formData.append("title", postData.title);
-    formData.append("description", postData.description);
-    formData.append("location", postData.location);
-    formData.append("category", postData.category);
-  
-    if (postData.image) {
-      formData.append("image", postData.image);
-    }
-  
-    formData.append("user", JSON.stringify({
-      name: "Current User",
-      avatar: "/placeholder.svg",
-    }));
-    formData.append("date", new Date().toISOString().split("T")[0]);
-  
-    // ✅ Inspect formData
-    console.log("Form Data Contents:");
-    for (let pair of formData.entries()) {
-      console.log(`${pair[0]}: ${pair[1]}`);
+    if (!token) {
+      alert("You are not authorized. Please login first!");
+      return;
     }
   
     try {
-      const res = await axios.post("http://localhost:3000/api/posts/", formData, {
-        withCredentials: true,
-      },{Header
-        
+      setIsSubmitting(true); // start loading
+  
+      const formData = new FormData();
+      formData.append("title", postData.title);
+      formData.append("description", postData.description);
+      formData.append("location", postData.location);
+      formData.append("category", postData.category);
+      formData.append("type", postData.type);
+      formData.append("image", postData.image); 
+  
+      const response = await axios.post("http://localhost:3000/api/posts", formData, {
+        headers: {
+          "x-access-header": token,
+          "Content-Type": "multipart/form-data",
+        },
       });
-      console.log("Upload successful:", res.data);
+  
+      toast.success("Post created successfully!");
+      
+  
+      // Reset form
+      setPostData({
+        type: "lost",
+        title: "",
+        description: "",
+        location: "",
+        category: "accessories",
+        image: null,
+      });
+      setImageFile(null);
+      setImagePreview(null);
+      
     } catch (error) {
-      console.error("Upload failed:", error);
+      console.error("Error creating post", error);
+      toast.error("Failed to submit post!");
+    } finally {
+      setIsSubmitting(false); // stop loading
     }
-    
   };
+  
   
   return (
     <div className="w-full md:max-w-2xl mx-auto p-2 md:p-6">

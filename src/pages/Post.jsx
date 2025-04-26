@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, Calendar, MessageCircle, Eye } from 'lucide-react';
 import ViewPost from './ViewPost';
+import ClaimPost from './Claimpost';
 
 function Post({ 
   id,
@@ -16,6 +17,12 @@ function Post({
   onViewClick 
 }) {
   const [showViewPost, setShowViewPost] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  
+  const handleSubmit = (description) => {
+    console.log("Submitted description:", description);
+    // Handle the submission logic here
+  };
 
   return (
     <>
@@ -65,7 +72,7 @@ function Post({
             </div>
             <div className="flex items-center gap-4">
               <button 
-                onClick={() => onMessageClick?.(id)}
+                onClick={() => setShowModal(true)}
                 className="text-gray-400 hover:text-white transition-colors"
               >
                 <MessageCircle size={20} />
@@ -108,7 +115,14 @@ function Post({
           }}
           onClose={() => setShowViewPost(false)}
         />
+        
       )}
+      {showModal && (<ClaimPost 
+        itemName={title}
+
+        onClose={() => setShowModal(false)}
+        onSubmit={handleSubmit}
+      />)}
     </>
   );
 }

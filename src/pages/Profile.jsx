@@ -1,41 +1,64 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Mail, Key, User, Trash2, Edit2 } from 'lucide-react';
 import Post from './Post';
+import { useAuth } from '../Hooks/api/context/useAuth';
 
 function Profile() {
+   const { auth,posts} = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  const [userDetails, setUserDetails] = useState({
-    fullName: 'John Doe',
-    studentId: '2023CS1234',
-    email: 'john.doe@university.edu',
-    password: '********'
-  });
 
-  // Mock user posts
-  const [userPosts, setUserPosts] = useState([
-    {
-      id: 1,
-      title: "Lost Blue Backpack",
-      description: "I lost my blue North Face backpack near the library.",
-      location: "University Library",
-      date: "2023-04-22",
-      type: "lost",
-      category: "accessories",
-      user: {
-        name: "John Doe",
-        avatar: "/placeholder.svg",
-      },
-      image: "/placeholder.svg"
-    }
-    // Add more posts as needed
-  ]);
+const [userDetails, setUserDetails] = useState({
+  fullName: '',
+  studentId: '',
+  email: '',
+  password: '********',
+});
 
+useEffect(() => {
+  const storedUser = localStorage.getItem('user');
+
+  if (storedUser) {
+    const user = JSON.parse(storedUser);
+    console.log("User from localStorage:", user);
+
+    setUserDetails({
+      fullName: user?.data?.name || '',
+      studentId: user?.data?.studentId || '',
+      email: user?.data?.email || '',
+      password: '********'
+    });
+  }
+}, []);
+
+  //  user posts
+  const [userPosts, setUserPosts] = useState([]);
+
+  useEffect(() => {
+    const filteredPosts = posts
+      .filter(post => post.postedBy.name === userDetails.fullName)
+      .map((post, index) => ({
+        id: index + 1, // or post.id if you already have an id
+        title: post.title || "No Title", // or whatever field your post has
+        description: post.description || "No Description",
+        location: post.location || "Unknown Location",
+        date: post.date || new Date().toISOString().split('T')[0], // today's date if missing
+        type: post.type || "lost",
+        category: post.category || "others",
+        user: {
+          name: post.postedBy.name,
+          avatar: post.postedBy.avatar || "/placeholder.svg",
+        },
+        image: post.image || "/placeholder.svg",
+      }));
+  
+    setUserPosts(filteredPosts);
+  }, [posts, userDetails.fullName]);
   const handleUpdateDetails = (e) => {
     e.preventDefault();
     setIsEditing(false);
     // Handle update logic here
   };
-
+  
   const handleDeletePost = (postId) => {
     setUserPosts(posts => posts.filter(post => post.id !== postId));
   };
@@ -48,7 +71,7 @@ function Profile() {
         <div className="px-6 pb-6">
           <div className="relative flex items-end -mt-12 mb-4">
             <img
-              src="/placeholder.svg"
+              src={`https://robohash.org/${userDetails.fullName}`}
               alt="Profile"
               className="w-24 h-24 rounded-full border-4 border-gray-800 bg-gray-700"
             />

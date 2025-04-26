@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import LoginBg from "../assets/LoginBg.jpg";
 import { useSignin } from "../Hooks/api/Auth/useSignin";
+import { useSignup } from "../Hooks/api/Auth/useSignup";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -10,11 +11,12 @@ const Login = () => {
   const [studentId, setStudentId] = useState("");
   const [email, setEmail] = useState("");
   const {isPending,isSuccess,signinMutation}=useSignin();
-
+  const {signupMutation}=useSignup();
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
     console.log(studentId,password)
+    if (isLogin) {
+      // Handle login logic here
     await signinMutation(
       {
         studentId,
@@ -22,6 +24,12 @@ const Login = () => {
       }
     )
 
+    } else {
+
+      signupMutation({email,password,studentId,name:fullName});
+      setIsLogin(true);
+      console.log("Sign Up:", { fullName, studentId, email, password });
+    }
   }
 
   return (
@@ -105,7 +113,7 @@ const Login = () => {
                         type="text"
                         value={studentId}
                         onChange={(e) => {
-                          
+                          setStudentId(e.target.value);
                         }}
                         className="w-full p-2 border border-[#E2E8F0] rounded-lg focus:ring-[#2462EA] focus:ring-2 outline-none"
                         placeholder="Enter your student ID"

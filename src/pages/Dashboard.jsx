@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Search, Download, Eye, Check, Trash2, Filter } from 'lucide-react';
+import { useAuth } from '../Hooks/api/context/useAuth';
 
 function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -8,36 +9,32 @@ function Dashboard() {
     status: 'all'
   });
 
-  // Mock statistics
-  const stats = {
-    totalItems: 156,
-    activeItems: 45,
-    resolvedItems: 111,
-    totalUsers: 89
-  };
+  const { posts } = useAuth();
 
-  // Mock items data
-  const [items] = useState([
-    {
-      id: 1,
-      title: "Lost Blue Backpack",
-      type: "lost",
-      location: "University Library",
-      date: "2023-04-22",
-      status: "active",
-      user: "Alex Johnson"
-    },
-    {
-      id: 2,
-      title: "Found Water Bottle",
-      type: "found",
-      location: "Engineering Building",
-      date: "2023-04-21",
-      status: "resolved",
-      user: "Taylor Wilson"
+  const [items, setItems] = useState([]);
+  
+  useEffect(() => {
+    if (posts && posts.length > 0) {
+      const mappedItems = posts.map((post, index) => ({
+        id: index + 1,
+        title: post.title,
+        type: post.type,
+        location: post.location,
+        date: new Date(post.createdAt).toLocaleDateString(),
+        status: post.status,
+        user: post.postedBy?.name || 'Unknown'
+      }));
+  
+      setItems(mappedItems);
     }
-  ]);
-
+  }, [posts]);
+  
+  const stats = {
+    totalItems: items.length,
+    activeItems: items.filter(item => item.status === 'active').length,
+    resolvedItems: items.filter(item => item.status === 'resolved').length,
+    totalUsers: new Set(posts.map(post => post.postedBy?.email)).size
+  };
   const handleExportData = () => {
     console.log('Exporting data...');
   };
